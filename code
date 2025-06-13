@@ -1,0 +1,29 @@
+#include "stm32f4xx.h"
+void SysTick_Init(void) 
+{
+    SysTick->LOAD = 16000 - 1;          
+    SysTick->VAL = 0;                    
+    SysTick->CTRL = 5;                    
+}
+
+void delay_ms(uint32_t ms) 
+{
+    for (uint32_t i = 0; i < ms; i++) 
+    {
+    while (!(SysTick->CTRL & (1 << 16))); 
+    }
+}
+
+int main(void) 
+{
+    SysTick_Init();
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    GPIOA->MODER &= ~(3 << (5 * 2));
+    GPIOA->MODER |=  (1 << (5 * 2));
+
+    while (1)
+   {
+        GPIOA->ODR ^= (1 << 5);
+        delay_ms(3000);
+    }
+}
